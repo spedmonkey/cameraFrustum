@@ -1,0 +1,23 @@
+import pymel.core
+aData = pymel.core.PyNode('perspShape')
+
+corners = {}
+
+horizontalFov = aData.getHorizontalFilmAperture() * 0.5 / ( aData.getFocalLength() * 0.03937 )
+verticalFov =aData.getVerticalFilmAperture()* 0.5 / ( aData.getFocalLength() * 0.03937 )
+
+farRight = aData.getFarClipPlane() * horizontalFov
+farTop = aData.getFarClipPlane() * verticalFov
+
+nearRight = aData.getNearClipPlane()* horizontalFov
+nearTop = aData.getNearClipPlane() * verticalFov
+
+corners['farTopRight']  = [farRight,farTop,-aData.getFarClipPlane()]
+corners['farTopLeft']   = [-farRight,farTop,-aData.getFarClipPlane()]
+corners['farLowLeft']   = [-farRight,-farTop,-aData.getFarClipPlane()]
+corners['farLowRight']  = [farRight,-farTop,-aData.getFarClipPlane()]
+
+corners['nearTopRight'] = [nearRight,nearTop,-aData.getNearClipPlane()]   
+corners['nearTopLeft']  = [-nearRight,nearTop,-aData.getNearClipPlane()]  
+corners['nearLowLeft']  = [-nearRight,-nearTop,-aData.getNearClipPlane()] 
+corners['nearLowRight'] = [nearRight,-nearTop,-aData.getNearClipPlane()]  
