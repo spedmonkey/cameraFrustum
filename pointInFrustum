@@ -1,0 +1,62 @@
+import pymel.core
+import maya.cmds as cmds
+import maya.OpenMaya as OpenMaya
+
+aData = pymel.core.PyNode('perspShape')
+myCam = pymel.core.PyNode('persp')
+myObject =  pymel.core.PyNode('pSphere1')
+
+objectPosition = pm.xform(myObject,q=1,ws=1,rp=1)
+
+corners = {}
+
+horizontalFov = aData.getHorizontalFilmAperture() * 0.5 / ( aData.getFocalLength() * 0.03937 )
+verticalFov =aData.getVerticalFilmAperture()* 0.5 / ( aData.getFocalLength() * 0.03937 )
+
+farRight = aData.getFarClipPlane() * horizontalFov
+farTop = aData.getFarClipPlane() * verticalFov
+
+nearRight = aData.getNearClipPlane()* horizontalFov
+nearTop = aData.getNearClipPlane() * verticalFov
+
+corners['farTopRight']  = [farRight,farTop,-aData.getFarClipPlane()]
+corners['farTopLeft']   = [-farRight,farTop,-aData.getFarClipPlane()]
+corners['farLowLeft']   = [-farRight,-farTop,-aData.getFarClipPlane()]
+corners['farLowRight']  = [farRight,-farTop,-aData.getFarClipPlane()]
+
+corners['nearTopRight'] = [nearRight,nearTop,-aData.getNearClipPlane()]   
+corners['nearTopLeft']  = [-nearRight,nearTop,-aData.getNearClipPlane()]  
+corners['nearLowLeft']  = [-nearRight,-nearTop,-aData.getNearClipPlane()] 
+corners['nearLowRight'] = [nearRight,-nearTop,-aData.getNearClipPlane()]  
+
+objectMatrix = myCam.worldMatrix[0].get()
+#inverseCameraMatrix = objectMatrix.inverse()
+#objectWorldSpace =  objectPosition*inverseCameraMatrix
+
+#Test x coordinate 
+#Calculating whether point is in rectangle
+#http://math.stackexchange.com/questions/190111/how-to-check-if-a-point-is-inside-a-rectangle
+if corners['nearTopRight'][0] <= objectPosition[0] <= corners['farTopRight'][0]:
+    print 'is between'
+else:
+    print corners['nearTopRight'][0]
+    print objectPosition[0]
+    print corners['farTopRight'][0]
+    print 'is not between'
+	
+
+#destMatrix = pm.dt.Matrix()
+#transformMatrix = objectMatrix.inverse() * destMatrix
+#somePoint = pm.dt.Point(corners['farTopRight'])
+
+#objectMatrix.inverse()
+#worldSpacePoint = somePoint * transformMatrix
+'''
+for i in corners:
+    somePoint = pm.dt.Point(corners[i])
+    worldSpacePoint = somePoint * objectMatrix
+    #somePoint = pm.dt.Point(corners[i])
+    pm.spaceLocator(p=worldSpacePoint)
+    print corners[i]
+    
+'''
