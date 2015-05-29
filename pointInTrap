@@ -1,0 +1,43 @@
+import pymel.core as pm 
+import math 
+myObject=pm.PyNode('pSphere1')
+
+A=pm.PyNode('A')
+B=pm.PyNode('B')
+C=pm.PyNode('C')
+D=pm.PyNode('D')
+
+
+APos=pm.xform(A, q=1,ws=1,rp=1)
+BPos=pm.xform(B, q=1,ws=1,rp=1)
+CPos=pm.xform(C, q=1,ws=1,rp=1)
+DPos=pm.xform(D, q=1,ws=1,rp=1)
+
+myObjectPos=pm.xform(myObject, q=1,ws=1,rp=1)
+
+
+math.hypot(p2[0] - p1[0], p2[1] - p1[1])
+distance = squareroot (x1-x2)
+
+def myVector (vector1, vector2):
+    result = vector1[0]-vector2[0],vector1[2] -vector2[2]
+    return result
+    
+def crossProduct(vector1, vector2):
+    result= vector1[0]*vector2[0]+vector1[1]*vector2[1]
+    return result
+
+AM = myVector (myObjectPos, APos)
+AB = myVector (BPos, APos)  
+AD = myVector (DPos, APos)
+
+if 0<crossProduct(AM,AB)<crossProduct(AB,AB) :
+    print 'passed test 1'
+else:
+    print 'failed test 1'
+'''
+if 0<dotProduct(AM, AD)<dotProduct(AD,AD):
+    print 'passed test 2'
+else:
+    print 'failed test 2'
+'''
