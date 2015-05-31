@@ -1,75 +1,65 @@
 import pymel.core as pm
 import maya.cmds as cmds
 import maya.OpenMaya as OpenMaya
+myList=[]
+for i in pm.ls():
+	try:
+		
+		myList.append(inFrustum(i))
+		print 'success'
+	except:
+		print 'fail'
 
-aData = pymel.core.PyNode('testShape')
-myCam = pymel.core.PyNode('test')
-myObject =  pymel.core.PyNode('pSphere1')
+pm.select(myList)
 
-camMatrix=[]
-objectMatrix=[]
-camMatrix = myCam.worldMatrix[0].get()
-objecttMatrix = myObject.worldMatrix[0].get()
+def inFrustum(viewableObject):
+	aData = pymel.core.PyNode('testShape')
+	myCam = pymel.core.PyNode('test')
+	myObject =  pymel.core.PyNode(viewableObject)
 
-
-myPoint = pm.dt.Point( pm.xform(myObject,q=1,ws=1,rp=1))
-
-objectPosition = myPoint * camMatrix.inverse()
-print objectPosition
-
-corners = {}
-
-horizontalFov = aData.getHorizontalFilmAperture() * 0.5 / ( aData.getFocalLength() * 0.03937 )
-verticalFov =aData.getVerticalFilmAperture()* 0.5 / ( aData.getFocalLength() * 0.03937 )
-
-farRight = aData.getFarClipPlane() * horizontalFov
-farTop = aData.getFarClipPlane() * verticalFov
-
-nearRight = aData.getNearClipPlane()* horizontalFov
-nearTop = aData.getNearClipPlane() * verticalFov
-
-corners['farTopRight']  = [farRight,farTop,-aData.getFarClipPlane()]
-corners['farTopLeft']   = [-farRight,farTop,-aData.getFarClipPlane()]
-corners['farLowLeft']   = [-farRight,-farTop,-aData.getFarClipPlane()]
-corners['farLowRight']  = [farRight,-farTop,-aData.getFarClipPlane()]
-
-corners['nearTopRight'] = [nearRight,nearTop,-aData.getNearClipPlane()]   
-corners['nearTopLeft']  = [-nearRight,nearTop,-aData.getNearClipPlane()]  
-corners['nearLowLeft']  = [-nearRight,-nearTop,-aData.getNearClipPlane()] 
-corners['nearLowRight'] = [nearRight,-nearTop,-aData.getNearClipPlane()]  
+	camMatrix=[]
+	objectMatrix=[]
+	camMatrix = myCam.worldMatrix[0].get()
+	objecttMatrix = myObject.worldMatrix[0].get()
 
 
+	myPoint = pm.dt.Point( pm.xform(myObject,q=1,ws=1,rp=1))
 
-#objectPosition=objectMatrix.inverse()*objectPosition
-#objectPosition = [objectPosition[0][0],objectPosition[1][1], objectPosition[2][2]]
+	objectPosition = myPoint * camMatrix.inverse()
 
-#test z
-near=corners['nearTopRight'] = [nearRight,nearTop,-aData.getNearClipPlane()]  
-far=corners['farTopRight']  = [farRight,farTop,-aData.getFarClipPlane()]
-if near[2] > objectPosition[2] > far[2]:
-    print 'objecct is inside z'
-else:
-    print 'object is outside of z'
-    
-#test y
-#y=mx+b
-m= (corners['farTopRight'][1]-corners['nearTopRight'] [1])/(corners['farTopRight'][2]-corners['nearTopRight'] [2])
+	corners = {}
 
+	horizontalFov = aData.getHorizontalFilmAperture() * 0.5 / ( aData.getFocalLength() * 0.03937 )
+	verticalFov =aData.getVerticalFilmAperture()* 0.5 / ( aData.getFocalLength() * 0.03937 )
 
-if objectPosition[1]<objectPosition[2]*m and objectPosition[1]>objectPosition[2]*-m :
-    print 'objecct is inside y'
-else:
-    print 'object is outside of y'
-    
-    
-#test x
-gradX = (corners['farTopRight'][2]-corners['nearTopRight'] [2])/(corners['farTopRight'][0]-corners['nearTopRight'] [0])
+	farRight = aData.getFarClipPlane() * horizontalFov
+	farTop = aData.getFarClipPlane() * verticalFov
 
+	nearRight = aData.getNearClipPlane()* horizontalFov
+	nearTop = aData.getNearClipPlane() * verticalFov
 
-if objectPosition[2]<objectPosition[0]*gradX and objectPosition[2]<objectPosition[0]*-gradX:
-    print 'objecct is inside x'
-else:
-    print 'object is outside of x'
+	corners['farTopRight']  = [farRight,farTop,-aData.getFarClipPlane()]
+	corners['farTopLeft']   = [-farRight,farTop,-aData.getFarClipPlane()]
+	corners['farLowLeft']   = [-farRight,-farTop,-aData.getFarClipPlane()]
+	corners['farLowRight']  = [farRight,-farTop,-aData.getFarClipPlane()]
+
+	corners['nearTopRight'] = [nearRight,nearTop,-aData.getNearClipPlane()]   
+	corners['nearTopLeft']  = [-nearRight,nearTop,-aData.getNearClipPlane()]  
+	corners['nearLowLeft']  = [-nearRight,-nearTop,-aData.getNearClipPlane()] 
+	corners['nearLowRight'] = [nearRight,-nearTop,-aData.getNearClipPlane()]  
 
 
-        
+
+	#objectPosition=objectMatrix.inverse()*objectPosition
+	#objectPosition = [objectPosition[0][0],objectPosition[1][1], objectPosition[2][2]]
+
+	#test z
+	near=corners['nearTopRight'] = [nearRight,nearTop,-aData.getNearClipPlane()]  
+	far=corners['farTopRight']  = [farRight,farTop,-aData.getFarClipPlane()]
+	m= (corners['farTopRight'][1]-corners['nearTopRight'] [1])/(corners['farTopRight'][2]-corners['nearTopRight'] [2])
+	gradX = (corners['farTopRight'][2]-corners['nearTopRight'] [2])/(corners['farTopRight'][0]-corners['nearTopRight'] [0])
+
+	if 	near[2] > objectPosition[2] > far[2] and \
+		objectPosition[1]<objectPosition[2]*m and objectPosition[1]>objectPosition[2]*-m and \
+		objectPosition[2]<objectPosition[0]*gradX and objectPosition[2]<objectPosition[0]*-gradX:
+		return viewableObject
